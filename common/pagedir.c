@@ -4,26 +4,20 @@
 #include<stdbool.h>
 #include "pagedir.h"
 #include "../libcs50/webpage.h"
+#include "../libcs50/bag.h"
+#include "../libcs50/hashtable.h"
 
 /*
  * Determines if a directory exists by creating a file in that directory and 
  * trying to write to it. Returns true if the directory is valid, false otherwise. 
  * 
- * The directory can be in the form "./dir" or "./dir/". 
- * The function will modify the former to add the final slash onto the end. 
+ * The directory must be in the form "./direc/" so make sure it's passed in that way. 
  * 
  * Limitations: the file ".crawler" will remain in the directory if the given
  * directory is valid. 
  */
 bool check_directory(char *dir){
     int len = strlen(dir);
-
-    
-    //if it doesn't end with a "/", add one
-    if (strcmp(&dir[len], "/") != 0){
-        dir = realloc(dir, sizeof(dir)+3*sizeof(char));
-        strcat(dir, "/");   
-    }
 
     //making the filename string to be "directory/.crawler"
     char filename[len+15];
@@ -63,31 +57,50 @@ char *page_fetcher(webpage_t *page){
  * If the filename or the webpage are null, it prints to stderr. 
  */
 void page_saver(webpage_t *page, char *filepath){
-    if (page == NULL || filepath == NULL){
-        fprintf(stderr, "Null page or filename");
+    if (page == NULL || filepath == NULL || webpage_getHTML(page) == NULL || webpage_getURL(page) == NULL){
+        fprintf(stderr, "Null page or filename\n");
     }
     else {  
         FILE *fp = fopen(filepath, "w");
         if (fp != NULL){
             fprintf(fp, "%s\n", webpage_getURL(page));
             fprintf(fp, "%d\n", webpage_getDepth(page));
-            fprintf(fp, "%s\n", webpage_getHTML(page));
+            fprintf(fp, "%s", webpage_getHTML(page));
         }
-
+        fclose(fp);
     }
 }
 
 
-/* Returns the next URL from the page, given that it is not NULL.
- * Relies on webpage.c, so see that for more details. 
+/* 
+ * Loops through each url on the given page, checks if it is internal and normalizeable, inserts it into
+ * the hashtable of urls seen, allocates a new webpage for it, and inserts it into the bag. 
  */
-char *page_scanner(webpage_t *page){
-    if (page != NULL){
-        int pos = 0;
-        return webpage_getNextURL(page, &pos);
-    }
-    else{
-        return NULL;
-    }
+void page_scanner(webpage_t *page, bag_t *pages_to_crawl, hashtable_t *urls_seen){
+    if (page != NULL){ 
+        int pos = 0; 
+        char *next_url;
+        int depth;
 
-}
+        while ((next_url = webpage_getNextURL(page, &pos)) != NULL){ //while there are links left on this page 
+            char *blank = " ";
+            bool added = false;
+            
+            NormalizeURL(next_url);
+            if (IsInternalURL(next_url)){   //if the url is internal to the system
+            added = hashtable_insert(urls_seen, next_url, blank);
+                if (added){
+                    depth = webpage_getDepth(page) +1;
+                    webpage_t *new = webpage_new(next_url, depth, NULL);
+                    bag_insert(pages_to_crawl, new);
+                }
+                else{
+                    free(next_url); //if it wasn't added, won't get free'd when we free the bag later
+                }
+            }
+            else{
+                free(next_url);     //if it wasn't internal, won't get free'd when we free the bag later
+            }
+        }
+    } 
+} 

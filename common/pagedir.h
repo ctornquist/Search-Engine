@@ -6,6 +6,8 @@
 #include<string.h>
 #include<stdbool.h>
 #include"../libcs50/webpage.h"
+#include "../libcs50/bag.h"
+#include "../libcs50/hashtable.h"
 
 
 /*
@@ -38,7 +40,7 @@ void page_saver(webpage_t *page, char *filepath);
 /* Returns the next URL from the page, given that it is not NULL.
  * Relies on webpage.c, so see that for more details. 
  */
-char *page_scanner(webpage_t *page);
+void page_scanner(webpage_t *page, bag_t *pages_to_crawl, hashtable_t *urls_seen);
 
 
 

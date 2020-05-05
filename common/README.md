@@ -7,8 +7,7 @@
  * Determines if a directory exists by creating a file in that directory and 
  * trying to write to it. Returns true if the directory is valid, false otherwise. 
  * 
- * The directory can be in the form "./dir" or "./dir/". 
- * The function will modify the former to add the final slash onto the end. 
+ * The directory must be in the form "./direc/" so make sure it's passed in that way. 
  * 
  * Limitations: the file ".crawler" will remain in the directory if the given
  * directory is valid. 
@@ -30,13 +29,15 @@ char *page_fetcher(webpage_t *page);
  */
 void page_saver(webpage_t *page, char *filepath);
 
-/* Returns the next URL from the page, given that it is not NULL.
- * Relies on webpage.c, so see that for more details. 
+/* 
+ * Loops through each url on the given page, checks if it is internal and normalizeable, inserts it into
+ * the hashtable of urls seen, allocates a new webpage for it, and inserts it into the bag. 
  */
-char *page_scanner(webpage_t *page);
+void page_scanner(webpage_t *page, bag_t *pages_to_crawl, hashtable_t *urls_seen);
 ```
 
 ### Implementation
 
-This module relies heavily on ```webpage.c``` which was provided by the CS50 professors. Each function apart from ```check_directory``` simply calls the similar function from webpage,  adding formatting/editing of variables and checking for NULL pointers.   
-    It is supposed to be used by ``crawler.c`` to help with manipulating webpages. 
+This module relies heavily on ```webpage.c``` which was provided by the CS50 professors. ```page_fetcher``` and ```page_saver``` simply call functions from webpage,  adding formatting/editing of variables and checking for NULL pointers when appropriate. The function ```check_directory``` creates a new file inside the directory specified to determine if the directory exists and is writable. 
+```page_scanner```loops through all the URLs on the given page, calling ```webpage_getNextURL``` until there are no more URLs. It then puts that URL into a webpage structure, and add the webpage to the bag of pages left to explore. 
+    

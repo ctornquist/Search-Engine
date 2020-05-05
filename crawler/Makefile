@@ -17,10 +17,12 @@ webpage.o: ../libcs50/webpage.h ../libcs50/file.h
 #PHONY
 .PHONY: test clean
 
-test: $(PROG)
-	./$(PROG) 
+test: 
+	bash testing.sh
 
 clean:
 	rm -f *~ *.o *.dSYM
 	rm -f $(PROG)
 	rm -f core
+	rm -f test/*
+	rm -f test*/*
