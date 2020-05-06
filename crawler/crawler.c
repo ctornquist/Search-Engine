@@ -11,7 +11,9 @@ void delete_blank(void *blank);
  
  
 int main(int argc, char* argv[]){ 
-    if (argc != 4){                                         //has to have four arguments
+    //has to have four arguments
+    //have to check the number before I try to parse the arguments
+    if (argc != 4){
         fprintf(stderr, "Needs three arguments.\n");
         return 1;
     }
@@ -22,60 +24,58 @@ int main(int argc, char* argv[]){
     int copy = (int)(*argv[3]);                     //will be 48 if the user inputs 0
  
     //PARAMETER CHECKING
-    //if (1==1){
-        if (max_depth == 0 && copy != 48){                      //if they entered a string 
-            fprintf(stderr, "Please enter an integer for max depth.\n");
-            free(seed_url);
-            return 1;
-        }
-
-        if (max_depth < 0){                                     //negative input
-            fprintf(stderr, "Depth must not be negative.\n");
-            free(seed_url);
-            return 1;
-        }
+    if (max_depth == 0 && copy != 48){                      //if they entered a string 
+        fprintf(stderr, "Please enter an integer for max depth.\n");
+        free(seed_url);
+        return 1;
+    }
+        
+    if (max_depth < 0){                                     //negative input
+        fprintf(stderr, "Depth must not be negative.\n");
+        free(seed_url);
+        return 1;
+    }
     
-        //is the URL internal
-        strcpy(seed_url, argv[1]);
-        bool norm = IsInternalURL(seed_url);         //also normalizes the url
-        if(!norm){
-            fprintf(stderr, "Seed url not internal.\n");
-            free(seed_url);
-            return 1;
-        }
+    //is the URL internal
+    strcpy(seed_url, argv[1]);
+    bool norm = IsInternalURL(seed_url);         //also normalizes the url
+    if(!norm){
+        fprintf(stderr, "Seed url not internal.\n");
+        free(seed_url);
+        return 1;
+    }
 
-        //checking if the URL actually points somehere by seeing if we can get its HTML 
-        char *copy_url = malloc(100*sizeof(char));
-        strcpy(copy_url, seed_url);
-        webpage_t *exist = webpage_new(copy_url, 0, NULL);
-        if (!webpage_fetch(exist)){
-            fprintf(stderr, "Seed url points to nonexistant server.\n");
-            webpage_delete(exist);
-            free(seed_url);
-            return 1;
-        }
+    //checking if the URL actually points somehere by seeing if we can get its HTML 
+    char *copy_url = malloc(100*sizeof(char));
+    strcpy(copy_url, seed_url);
+    webpage_t *exist = webpage_new(copy_url, 0, NULL);
+    if (!webpage_fetch(exist)){
+        fprintf(stderr, "Seed url points to nonexistant server.\n");
         webpage_delete(exist);
+        free(seed_url);
+        return 1;
+    }
+    webpage_delete(exist);
 
-        //to add a slash onto the end of the directory we have to realloc data, so must calloc it here
-        char *dir = calloc(strlen(argv[2])+2, sizeof(char));
-        strcpy(dir, argv[2]);
+    //to add a slash onto the end of the directory we have to realloc data, so must calloc it here
+    char *dir = calloc(strlen(argv[2])+2, sizeof(char));
+    strcpy(dir, argv[2]);
 
-        //if the directory doesn't end with a "/", add one
-        int len = strlen(argv[2]);
-        if (strcmp(&dir[len-1], "/") != 0){
-            dir = realloc(dir, sizeof(dir)+3*sizeof(char));
-            strcat(dir, "/");
-        } 
+    //if the directory doesn't end with a "/", add one
+    int len = strlen(argv[2]);
+    if (strcmp(&dir[len-1], "/") != 0){
+        dir = realloc(dir, sizeof(dir)+3*sizeof(char));
+        strcat(dir, "/");
+    } 
 
-        //checking if directory is valid
-        bool good = check_directory(dir);
-        if (!good){
-            fprintf(stderr, "Invalid directory\n");
-            free(dir);
-            free(seed_url);
-            return 1;
-        } 
-    //}
+    //checking if directory is valid
+    bool good = check_directory(dir);
+    if (!good){
+        fprintf(stderr, "Invalid directory\n");
+        free(dir);
+        free(seed_url);
+        return 1;
+    } 
 
 
     //CRAWLING VARIABLES

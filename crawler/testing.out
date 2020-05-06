@@ -1,0 +1,29 @@
+bash testing.sh
+make[1]: Entering directory '/net/ifs-users/ctornquist/cs50/labs/tse-ctornquist/crawler'
+rm -f *~ *.o *.dSYM
+rm -f crawler
+rm -f core
+rm -f test/*
+rm -f test*/*
+make[1]: Leaving directory '/net/ifs-users/ctornquist/cs50/labs/tse-ctornquist/crawler'
+make[1]: Entering directory '/net/ifs-users/ctornquist/cs50/labs/tse-ctornquist/crawler'
+gcc -Wall -g -pedantic -std=c11 -ggdb -I ../libcs50 -I ../common   -c -o crawler.o crawler.c
+gcc -Wall -g -pedantic -std=c11 -ggdb -I ../libcs50 -I ../common -lm crawler.o ../libcs50/webpage.o ../common/pagedir.o ../libcs50/libcs50-given.a ../common/common.a -o crawler
+make[1]: Leaving directory '/net/ifs-users/ctornquist/cs50/labs/tse-ctornquist/crawler'
+[H[2J[3JNeeds three arguments.
+Needs three arguments.
+Depth must not be negative.
+Please enter an integer for max depth.
+Invalid directory
+Seed url not internal.
+Seed url points to nonexistant server.
+Only in ./test1/: .crawler
+Only in ./test2/: .crawler
+Only in ./test3/: .crawler
+Only in ./test4/: .crawler
+Only in ./test5/: .crawler
+Only in ./test6/: .crawler
+Only in ./test7/: .crawler
+Only in ./test8/: .crawler
+Only in ./test9/: .crawler
+make: *** [Makefile:21: test] Error 1
