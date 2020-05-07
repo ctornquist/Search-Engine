@@ -6,6 +6,15 @@
 #include "../libcs50/bag.h" 
 #include "../libcs50/hashtable.h" 
 #include "../libcs50/set.h" 
+
+/*
+ *  crawler.c       Caroline Tornquist      May 6, 2020
+ * 
+ * Crawler takes a seed url, directory and max depth, and crawls that seed page for any links on the page. 
+ * It continues crawling those pages for any more links, and continues until the max depth is reached. It stores 
+ * each page crawled as a file in the directory given with a unique id number as the filename. 
+ * 
+ */
  
 void delete_blank(void *blank);
  
@@ -126,6 +135,12 @@ int main(int argc, char* argv[]){
     return 0; 
 } 
  
+
+ /*
+  * Hashtable requires a function to free the item, but we did not malloc any memory
+  * to be used for the item, as it was a blank char string. This is just passed in
+  * so we have enough parameters for hashtable_delete()
+  */
 
 void delete_blank(void *blank){
    

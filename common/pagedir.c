@@ -8,6 +8,18 @@
 #include "../libcs50/hashtable.h"
 
 /*
+ * pageDir.c    Caroline Tornquist      May 6, 2020
+ * 
+ * pageDir contains the definitions for functions to be used by crawler.c to maniuplate webpages. It relies 
+ * heavily on webpage.c. 
+ * 
+ * check_directory takes a char* and determines if it's a writable directory
+ * page_fetcher gets the html from a url and stores it in the html element of a struct webpage
+ * page_saver writes the url, depth and html data to a file in the given directory
+ * page_scanner scans the given page for urls and adds them to a bag (see bag.c)
+ */
+
+/*
  * Determines if a directory exists by creating a file in that directory and 
  * trying to write to it. Returns true if the directory is valid, false otherwise. 
  * 
