@@ -6,6 +6,7 @@
 #include "../libcs50/webpage.h"
 #include "../libcs50/bag.h"
 #include "../libcs50/hashtable.h"
+#include "../libcs50/file.h"
 
 /*
  * pageDir.c    Caroline Tornquist      May 6, 2020
@@ -18,6 +19,7 @@
  * page_saver writes the url, depth and html data to a file in the given directory
  * page_scanner scans the given page for urls and adds them to a bag (see bag.c)
  */
+
 
 /*
  * Determines if a directory exists by creating a file in that directory and 
@@ -116,3 +118,27 @@ void page_scanner(webpage_t *page, bag_t *pages_to_crawl, hashtable_t *urls_seen
         }
     } 
 } 
+
+
+/* Given an open file pointer, it loads the information from that file into a webpage + returns it.
+ * File is in format: 1st line is url, 2nd line is depth, rest is HTML content.
+ * Rewinds the file pointer at the end so it's left at the beginning of the file.
+ */
+webpage_t *page_load(FILE* fp){
+    char *URL;
+    char *depth;
+    char *HTML;
+    int dep;
+
+    URL = freadlinep(fp);               //this memory is freed when we free the webpage later
+    depth = freadlinep(fp);             //have to free this memory when we're done
+    HTML = freadfilep(fp);               //this memory is freed when we free the webpage later
+    dep = atoi(depth);                  //converting to integer
+    free(depth);
+
+    //loading webpage + HTML text
+    webpage_t *page = webpage_new(URL, dep, HTML);
+
+    rewind(fp);
+    return page;
+}

@@ -42,6 +42,12 @@ void page_saver(webpage_t *page, char *filepath);
  */
 void page_scanner(webpage_t *page, bag_t *pages_to_crawl, hashtable_t *urls_seen);
 
+/* Given an open file pointer, it loads the information from that file into a webpage + returns it.
+ * File is in format: 1st line is url, 2nd line is depth, rest is HTML content.
+ * Rewinds the file pointer at the end so it's left at the beginning of the file.
+ */
+webpage_t *page_load(FILE* fp);
+
 
 
 #endif //__PAGEDIR_H
