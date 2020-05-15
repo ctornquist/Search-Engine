@@ -8,10 +8,9 @@
 #include "../libcs50/counters.h"
 
 /* index.c Caroline Tornquist 5/12/20
+ * 
  * A program to read a directory produced by crawler, determine how many times each word appears
  * and in what files, and then print that data to the given file. 
- * 
- * command line: ./indexer crawlerDirectory filename
  */
 
 //local prototypes

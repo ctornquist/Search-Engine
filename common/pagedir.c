@@ -131,10 +131,12 @@ webpage_t *page_load(FILE* fp){
     int dep;
 
     URL = freadlinep(fp);               //this memory is freed when we free the webpage later
+    
     depth = freadlinep(fp);             //have to free this memory when we're done
-    HTML = freadfilep(fp);               //this memory is freed when we free the webpage later
     dep = atoi(depth);                  //converting to integer
     free(depth);
+    
+    HTML = freadfilep(fp);               //this memory is freed when we free the webpage later
 
     //loading webpage + HTML text
     webpage_t *page = webpage_new(URL, dep, HTML);

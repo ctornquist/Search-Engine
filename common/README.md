@@ -1,43 +1,13 @@
-# Lab 4 - Common Directory by Caroline Tornquist  
+# Lab 4 - Common Directory by Caroline Tornquist    
+
+### Compliation
+Simply "make" to create the archive, and "make clean" to remove all the .o files and the archive. 
   
-### Functions
-
-```c 
-/*
- * Determines if a directory exists by creating a file in that directory and 
- * trying to write to it. Returns true if the directory is valid, false otherwise. 
- * 
- * The directory must be in the form "./direc/" so make sure it's passed in that way. 
- * 
- * Limitations: the file ".crawler" will remain in the directory if the given
- * directory is valid. 
- */
-bool check_directory(char *dir);
-
-/* Uses the webpage module to get the HTML text from a given page. 
- * Checks if the webpage is NULL, and if not it returns a char * pointer
- * to the HTML text from the url of the webpage given. 
- */
-char *page_fetcher(webpage_t *page);
-
-/* Saves the data from the given webpage to "filename" in the following format:
- * The first line is the URL
- * The second line is the depth
- * The rest of the file is the HTML text of the given webpage
- * 
- * If the filename or the webpage are null, it prints to stderr. 
- */
-void page_saver(webpage_t *page, char *filepath);
-
-/* 
- * Loops through each url on the given page, checks if it is internal and normalizeable, inserts it into
- * the hashtable of urls seen, allocates a new webpage for it, and inserts it into the bag. 
- */
-void page_scanner(webpage_t *page, bag_t *pages_to_crawl, hashtable_t *urls_seen);
-```
-
-### Implementation
-
-This module relies heavily on ```webpage.c``` which was provided by the CS50 professors. ```page_fetcher``` and ```page_saver``` simply call functions from webpage,  adding formatting/editing of variables and checking for NULL pointers when appropriate. The function ```check_directory``` creates a new file inside the directory specified to determine if the directory exists and is writable. 
-```page_scanner```loops through all the URLs on the given page, calling ```webpage_getNextURL``` until there are no more URLs. It then puts that URL into a webpage structure, and add the webpage to the bag of pages left to explore. 
+### Programs
+  
+```word.c``` contains the function ```normalizeWord``` which converts a string to only lowercase letters, adding spaces where non alphabet characters are. See ```word.h``` for full documentation. 
+  
+```pagedir.c``` contains functions to check if a directory is openable, to save a webpage struct to a file, to get the HTML text from a url, to scan through webpages and to load data from a file into a webpage struct. Used primarily by ```crawler.c```. 
+  
+```index.c``` contains functions to build an index hashtable, save one to a file, and load it back from that file. See ```index.h``` for full documentation. Used primarily by ```indexer.c``` and ```indextest.c```. 
     

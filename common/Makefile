@@ -18,6 +18,6 @@ index.o: index.h
 
 clean:
 	rm -f *~ *.o *.dSYM
-	rm -f $(PROG)
 	rm -f core
+	rm -f common.a
 

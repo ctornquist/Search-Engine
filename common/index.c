@@ -22,7 +22,8 @@ void printer_ct(void *fp, int key, int count);
 /* This takes the name of a crawler directory path (that must end with a '/'), the length of that filename, 
  * and a hashtable pointer. 
  * Reading one file at a time from the directory, it reads each word in that file, adds it to the hashtable and puts
- * as the "item" a struct counters that has the filename where it appeared as the ID and the number of occurances as the count. 
+ * as the "item" a struct counters that has the filename where it appeared as the ID and the number of occurances as 
+ * the count. 
  */
 void index_build(char *filename, int len, hashtable_t *index){
     int j = 1;                                  //this will be the docID
@@ -36,7 +37,6 @@ void index_build(char *filename, int len, hashtable_t *index){
     //adding 1 to the end of filename
     sprintf(val, "%d", j);
     filename[len] = *val;
-    //printf("filename %d: %s\n", j, filename);
 
 
     while ( (fptr = fopen(filename, "r")) != NULL ) {       //while there are files left to read
@@ -73,7 +73,6 @@ void index_build(char *filename, int len, hashtable_t *index){
             filename[len+k] = val[k];
         }
         filename[len+val_len] = '\0';
-        //printf("filename %d: %s\n", j, filename);
 
         //cleaning up
         fclose(fptr);
@@ -112,6 +111,11 @@ void printer_ct(void *fp, int key, int count){
     fprintf(fo, "%d %d ", key, count);
 }
 
+
+/* Given a file created by indexer, with each line containing "word docId count [docID count]", load the data
+ * into a the given hastable, where each key is a word and each item is a counters struct that contains each
+ * file that word appears in and how many times it appears. 
+ */
 void index_load(FILE *fp, int num_words, hashtable_t *index){
     char *word;
     int id, count;

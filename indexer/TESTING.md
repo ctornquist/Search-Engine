@@ -1,1 +1,4 @@
- i teseted it la la la
+# Lab 5 Indexer - Caroline Tornquist
+
+### Methods
+I tested each of the modules as I was builing them, to ensure correctness throughout the process. Once I was certain each part worked as it should, I wrote a bash testing script to work through a few test cases. The first four ensure that the indexer parses arguments correctly, and should get error messages. The last four test cases try a variety of crawler directories, named crawler 1-4 respectively: letters at dep 6 (9 files), wiki at depth 1 (7 files), toscrape at depth 1 (~70 files), and toscrape at depth 2 (~600 files). The correct output for each of these directories is stored in ans1-4, respectively. For each test, the script calls indexer, which writes to the given file appropritately, uses indextest to rebuild + rewrite the file, and then compares both to the correct answer file using the diff command. If nothing appears to say "these two files differ," then everything worked correctly. 

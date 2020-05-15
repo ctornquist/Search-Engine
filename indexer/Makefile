@@ -1,7 +1,7 @@
 #VARIABLES
 CC = gcc
 CFLAGS = -Wall -g -pedantic -std=c11 -ggdb -I ../libcs50 -I ../common
-PROG = indexer
+PROG1 = indexer
 PROG2 = indextest
 OBJS1 = indexer.o ../libcs50/webpage.o ../common/pagedir.o ../common/word.o ../common/index.o
 OBJS2 = indextest.o ../libcs50/webpage.o ../common/pagedir.o ../common/word.o ../common/index.o
@@ -11,7 +11,7 @@ LIBS = -lm
 #RULES
 all: indexer indextest
 
-$(PROG): $(OBJS1) $(LLIBS)
+$(PROG1): $(OBJS1) $(LLIBS)
 	$(CC) $(CFLAGS) $(LIBS) $^ -o $@
 
 $(PROG2): $(OBJS2) $(LLIBS)
@@ -33,4 +33,5 @@ clean:
 	rm -f $(PROG1)
 	rm -f $(PROG2)
 	rm -f core
+	rm -f idx1* idx2* idx3* idx4*
 
