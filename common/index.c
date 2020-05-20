@@ -116,11 +116,12 @@ void printer_ct(void *fp, int key, int count){
  * into a the given hastable, where each key is a word and each item is a counters struct that contains each
  * file that word appears in and how many times it appears. 
  */
-void index_load(FILE *fp, int num_words, hashtable_t *index){
+void index_load(FILE *fp, hashtable_t *index){
     char *word;
     int id, count;
     counters_t *counters;
     bool is_first = true;
+    int num_words = lines_in_file(fp);
 
     for(int i=0; i<num_words; i++){                             //for each line
         word = freadwordp(fp);                                  //allocates memory that we have to free

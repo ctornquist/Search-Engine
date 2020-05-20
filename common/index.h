@@ -30,7 +30,7 @@ void index_save(FILE *fp, hashtable_t *index);
  * into a the given hastable, where each key is a word and each item is a counters struct that contains each
  * file that word appears in and how many times it appears. 
  */
-void index_load(FILE *fp, int num_words, hashtable_t *index);
+void index_load(FILE *fp, hashtable_t *index);
 
 
 #endif //__INDEX_H

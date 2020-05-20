@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
     int num_words = lines_in_file(fp1);
     hashtable_t *index = hashtable_new(num_words);
 
-    index_load(fp1, num_words, index);
+    index_load(fp1, index);
     index_save(fp2, index);
 
     //cleaning up
