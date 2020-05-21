@@ -18,7 +18,7 @@ index.o: ../common/index.h
 .PHONY: test clean
 
 test: 
-	./$(PROG)
+	./$(PROG) ../indexer/crawler1/ ../indexer/ans1
 
 clean:
 	rm -f *~ *.o *.dSYM
