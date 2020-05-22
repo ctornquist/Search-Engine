@@ -20,25 +20,30 @@ typedef struct ct_ptrs{         //to use both inside an interator
 typedef struct score{
     int docID;
     int score;
-}score_t;
+} score_t;
+
+typedef struct score_str{
+    score_t **pages;
+    int count;
+} score_srt_t;
 
 
 //local prototypes
-void free_words(char *words[], int words_size);
 bool parse_query(char *line, char *words[], int *words_size);
 bool validate_query(char *words[], int words_size);
+counters_t *copy_counter(counters_t *ctrs);
+void copy_iterator(void *copy, const int key, const int count);
 void and_seq (ct_ptrs_t *pointers);
 void helper_and(void *arg, const int key, const int count);
 void or_seq (counters_t *first, counters_t *second);
 void helper_or(void *first, const int key, const int count);
-counters_t *copy_counter(counters_t *ctrs);
-void copy_iterator(void *copy, const int key, const int count);
-void set_to_zero(counters_t *res_and);
-void zero_helper(void *arg, const int key, const int count);
-void delete_counters(void *ctrs);
-void print_scores(counters_t *res);
-void get_counters_num(void *arg, const int key, const int count);
+int get_counters_size(int *size, counters_t *ctrs);
+void size_helper(void *arg, const int key, const int count);
+void print_scores(counters_t *res, char *filename, int len);
 void insertion_sort(void *arg, const int key, const int count);
+void free_words(char *words[], int words_size);
+void free_docs(score_srt_t *docs, int num);
+void delete_counters(void *ctrs);
 
 
 int main(int argc, char *argv[]){
@@ -71,7 +76,7 @@ int main(int argc, char *argv[]){
     fclose(fp1);
 
     //deleting the .crawler off the end of filename by adding end of string character
-    filename[len+1] = '\0';
+    filename[len] = '\0';
 
     //checking if you can read into the index file
     FILE *fp2 = fopen(argv[2], "r");
@@ -88,64 +93,58 @@ int main(int argc, char *argv[]){
     //QUERYING
     index_load(fp2, index);
 
+    fprintf(stdout, "Query? ");
     while ((line = freadlinep(stdin)) != NULL){
         int line_len = strlen(line);           //the functional length will change when we add terminating characters
         char *words[line_len/2 +1];            //the max number of words is if the string alternates spaces and characters
         int words_size = 0;                    //to be updated by parse_query. 
-        counters_t *res_and;                   //will get newed when we add first word
+        counters_t *res_and;                   //will get newed when we insert the first word
         counters_t *res_or = counters_new();   //need to new here
         ct_ptrs_t *pointers = malloc(sizeof(ct_ptrs_t));    //to pass multiple things into the iterator
+        bool was_parsed;                        //was the query parsed correctly?
+        bool is_valid;                          //was the query valid?
+        bool is_empty = true;                    //is res_and empty
 
-        bool was_parsed = parse_query(line, words, &words_size);
-        if (!was_parsed){
-            break;
-        }
-        bool is_valid = validate_query(words, words_size);
+        was_parsed = parse_query(line, words, &words_size);
+        if (was_parsed){
+            is_valid = validate_query(words, words_size);
 
         if (is_valid){
             //printing the query
-            fprintf(stdout, "query: ");             
+            fprintf(stdout, "Query: ");             
             for (int j = 0; j< words_size; j++){
                 fprintf(stdout, "%s ", words[j]);
             }
             fprintf(stdout, "\n");
 
 
-            res_and = copy_counter(hashtable_find(index, words[0])); //making a copy and storing
-            fprintf(stdout, "first res_and: "); counters_print(res_and, stdout); fprintf(stdout, "\n");
-            if (words_size == 1){ //to take care of single word queries
-                res_or = res_and;
-            }
-            else {
-                for (int i = 1; i < words_size; i++){                    //looping over each word in the query
-                    if (strcmp(words[i], "or") != 0 && strcmp(words[i], "and") != 0){   //if it's not an 'or' or 'and' or the last word
-                        pointers->first = res_and;
-                        pointers->second = hashtable_find(index, words[i]);
-                        and_seq(pointers);                              //keep updating and
-                        fprintf(stdout, "%s res_and: ", words[i]); counters_print(res_and, stdout); fprintf(stdout, "\n");
-                    }
-                    else if (strcmp(words[i], "and") != 0){ //add everything to res_or on the last one
-                        or_seq(res_or, res_and);                        //if it's an or, update the or
-                        //set_to_zero(res_and);                           //set everying in and to 0
-                        counters_delete(res_and);
-                        res_and = counters_new();
-                        fprintf(stdout, "%s res_or: ", words[i]); counters_print(res_or, stdout); fprintf(stdout, "\n");
-                    }
+            for (int i = 0; i < words_size; i++){                    //looping over each word in the query
+                if (is_empty){
+                    res_and = copy_counter(hashtable_find(index, words[i]));
+                    is_empty = false;
                 }
-                or_seq(res_or, res_and); //afterwards, add anything in and still into or
+                else if (strcmp(words[i], "or") != 0 && strcmp(words[i], "and") != 0){   //if it's not an 'or' or 'and' or the last word
+                    pointers->first = res_and;
+                    pointers->second = hashtable_find(index, words[i]);                        
+                    and_seq(pointers);                              //keep updating and
+                    is_empty = false;
+                }
+                else if (strcmp(words[i], "and") != 0){ //add everything to res_or on the last one
+                    or_seq(res_or, res_and);                        //if it's an or, update the or
+                    counters_delete(res_and);
+                    is_empty = true;
+                }
             }
+            or_seq(res_or, res_and); //afterwards, add anything in and still into or
 
-            fprintf(stdout, "answer: "); counters_print(res_or, stdout);
-            printf("\n");
+            //fprintf(stdout, "answer: "); counters_print(res_or, stdout); printf("\n");
 
-            print_scores(res_or);
- 
             // res_or is now the final one with all the scores
-            // do another iteration to get the # of items
-            // one more to do an insertion sort
-            // one more to print each score, docID and get the url from the first line of that doc
+            print_scores(res_or, filename, len);
+            fprintf(stdout, "-----------------------------------------\n");
 
         }
+        } 
 
         
         //cleaning up for new query
@@ -156,7 +155,7 @@ int main(int argc, char *argv[]){
         if (words_size != 1){        //only gets newed if you have more than one word
             counters_delete(res_or);
         }
-        printf("\n");
+        fprintf(stdout, "Query? ");
     }
 
     //cleaning up
@@ -164,6 +163,7 @@ int main(int argc, char *argv[]){
     hashtable_delete(index, &delete_counters);
     fclose(fp2);
 }
+
 
 /*
  * A function to break up the query into distinct words, remove non alphabet characters, and insert
@@ -201,11 +201,11 @@ bool parse_query(char *line, char *words[], int *words_size){
     return true;
 }
 
+
 /*
  * Checks if the query starts or ends with an operator, or if it has two operators in a row. 
  * Returns whether the query is valid or not. 
  */
-
 bool validate_query(char *words[], int words_size){
     if (words_size < 1){
         fprintf(stderr, "No allowed words in your query.\n");
@@ -249,32 +249,23 @@ counters_t *copy_counter(counters_t *ctrs){
     return copy;
 }
 
+
 //helper function for above. 
 void copy_iterator(void *copy, const int key, const int count){
     counters_t *copy_c = copy;
     counters_set(copy_c, key, count);
 }
 
-/* Sets every count in the counters to 0. 
- */
-void set_to_zero(counters_t *res_and){
-    counters_iterate(res_and, res_and, &zero_helper);
-}
-
-//helper for above
-void zero_helper(void *arg, const int key, const int count){
-    counters_t *res_and = arg;
-    counters_set(res_and, key, 0);
-}
-
 
 /*
  * Combines two counters sets used together in an and sequence. Updates "first" to have the minumum of each of 
- * the keys in both counters. If one key doesn't appear in both, it's count will be set to 0. 
+ * the keys in both counters. If one key doesn't appear in both, it's count will be set to 0 in first. ct_ptrs_t 
+ * is a struct * containing pointers to the two counters_t structs that will be combined. 
  */
 void and_seq (ct_ptrs_t *pointers){
     counters_iterate(pointers->first, pointers, &helper_and);
 }
+
 
 /* Helper function to use with counters_iterate to get an and sequence. 
  */
@@ -295,15 +286,17 @@ void helper_and(void *arg, const int key, const int count){
     
 }
 
+
 /*
  * Combines two counters sets used together in an or sequence. Updates "first" to have the sum of each of 
- * the keys in both counters. 
+ * the keys in both counters. First is updated to contain the combination of the two. 
  */
 void or_seq (counters_t *first, counters_t *second){
     if (first != NULL && second != NULL){
         counters_iterate(second, first, &helper_or);
     }
 }
+
 
 /* Helper function to use with counters_iterate to get an or sequence. 
  */
@@ -319,18 +312,17 @@ void helper_or(void *first, const int key, const int count){
     }
 }
 
-void print_scores(counters_t *res){
-    int num = 0;
-    printf("print scores\n");
-    counters_iterate(res, &num, &get_counters_num);
-    printf("num is: %d\n", num);
 
-    counters_iterate(res, pages, &insertion_sort);
-
+/*Gets the number of nodes with non-zero counts. Updates size to have the size. 
+*/
+int get_counters_size(int *size, counters_t *ctrs){
+    counters_iterate(ctrs, size, &size_helper);
+    return *size;
 }
 
-//gets the number of nodes with non-zero counts
-void get_counters_num(void *arg, const int key, const int count){
+
+//helper for above
+void size_helper(void *arg, const int key, const int count){
     int *size = arg;
 
     if (count != 0){
@@ -338,15 +330,107 @@ void get_counters_num(void *arg, const int key, const int count){
     }
 }
 
-void insertion_sort(void *arg, const int key, const int count ){
-    if (count != 0){
-        score_t *pages = arg;
-        score_t item = {key, count};
+/* Given the counters struct that has all the final docIDs and counts, create an array of score structs containing each
+ * docID and score sorted in descending order. Print each docID, score and open the doc to read + print the url 
+ * corresponding to that docID. 
+ * 
+ * Caller provides: the counters struct, a char* name of the directory and the length of that name. 
+ */
+void print_scores(counters_t *res, char *filename, int len){
+    int num = 0;                                //number of docs with non-zero counts
+    FILE *fp;                                   //for reading url from file
+    char *val = malloc(8*sizeof(char));         //char version of docID
+    int val_len = 0;                            //length of val (# of digits in docID)
+    char *url;                                  //URL associated with each doc
 
+    counters_iterate(res, &num, &size_helper);                  //getting the number of docs w/ non zero counts
+
+    //initializing docs and inserting all of the score structs in descending order
+    score_srt_t *docs = malloc(sizeof(score_srt_t));
+    docs->pages = malloc(sizeof(score_t)*num);
+    docs->count = 0;
+    counters_iterate(res, docs, &insertion_sort);
+    fprintf(stdout, "Matches %d documents (ranked)\n", docs->count);
+
+    //printing scores and urls
+    for (int i = 0; i<docs->count; i++){
+        //updating the filename, have do it like this to deal with multi-digit docIDs
+        sprintf(val, "%d", docs->pages[i]->docID);
+        val_len = strlen(val);
+        for (int k = 0; k < val_len; k++){
+            filename[len+k] = val[k];            
+        }
+        filename[len+val_len] = '\0';
         
 
-    } 
-} 
+        //reading URL from first line of file, print docs and IDS
+        fp = fopen(filename, "r");
+        if (fp != NULL){
+            url = freadlinep(fp);
+            fprintf(stdout, "Score: %d Doc %d: ", docs->pages[i]->score, docs->pages[i]->docID);
+            fprintf(stdout, "%s\n", url);
+            
+            //free for next time around
+            free(url);
+            fclose(fp);
+        }
+
+    }
+
+    free_docs(docs, docs->count);   //free docs for next iteration
+    filename[len+1] = '\0';         //remove docIDs for next iteration
+    free(val);                      //clean up for next time
+ 
+}
+
+/* Used by counters_iterate on res_and to insert each item into an array of struct scores in descending order. 
+ * Arg is a struct that contains an array of struct scores and a counter to index into the array. 
+ * Uses insertion sort algorithm to get from the counters to the array. 
+ */ 
+void insertion_sort(void *arg, const int key, const int count ){
+    if (count != 0){
+        score_srt_t *docs = arg;                            //convert pointer
+        score_t *new = malloc(sizeof(score_t));             //allocate for new element
+        new->docID = key;                                   //update element
+        new->score = count;
+        bool flag = false;
+        int i;
+        //printf("this page first: %d\n", key);
+
+        if (docs->count > 0){                               //if there's more than one item                   
+            for (i = docs->count -1; i >= 0; i--){          //for each element in the array
+                if (docs->pages[i]->score < count){         //if that element is smaller than the count..
+                    //printf("moving %d to %d\n", i, i+1);
+                    if (docs->pages[i+1] == NULL){          //create a new node if needed
+                        //printf("allocating new one\n");
+                        docs->pages[i+1] = malloc(sizeof(score_t));
+                    }
+                    docs->pages[i+1]->docID = docs->pages[i]->docID;        //move each element one forward
+                    docs->pages[i+1]->score = docs->pages[i]->score;
+                    //fprintf(stdout, "0 is: %d, %d\n", docs->pages[i]->docID, docs->pages[i]->score);
+                    //fprintf(stdout, "1 is: %d, %d\n", docs->pages[i+1]->docID, docs->pages[i+1]->score);
+                    flag = true;
+                    //printf("changing thing around\n");
+                }
+                else {
+                    break;
+                }
+            }
+            if(flag){
+                free(docs->pages[i+1]);                        //if items were moved, free what was in the last slot moved
+                docs->pages[i+1] = new;                        //insert new item into that slot
+                //printf("inserting in slot %d\n", i+1);
+                //fprintf(stdout, "after 0 is: %d, %d\n", docs->pages[0]->docID, docs->pages[0]->score);
+                //fprintf(stdout, "after 1 is: %d, %d\n", docs->pages[1]->docID, docs->pages[1]->score);
+            } else {                                     //if nothing was moved (it belongs at the end), insert it there
+                docs->pages[docs->count] = new;
+            }
+        } else {                                        //first time around, just insert it
+            docs->pages[docs->count] = new;
+        }
+        docs->count = docs->count + 1;                  //increment counter
+    }  
+}  
  
 
 /*
@@ -359,6 +443,18 @@ void free_words(char *words[], int words_size){
         }
     }
 }
+
+/* Loop over all the elements in doc's array, freeing each one, then free the struct itself
+ */
+
+void free_docs(score_srt_t *docs, int num){
+    for(int i = 0; i < num; i++){
+        free(docs->pages[i]);
+    }
+    free(docs->pages);
+    free(docs);
+}
+
 
 /* hashtable_delete() requires a function with a void* parameter, so this just takes care of that. 
  */
