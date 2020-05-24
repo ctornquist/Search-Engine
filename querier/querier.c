@@ -406,12 +406,14 @@ void insertion_sort(void *arg, const int key, const int count ){
                         //printf("allocating new one\n");
                         docs->pages[i+1] = malloc(sizeof(score_t));
                     }
-                    docs->pages[i+1]->docID = docs->pages[i]->docID;        //move each element one forward
-                    docs->pages[i+1]->score = docs->pages[i]->score;
-                    //fprintf(stdout, "0 is: %d, %d\n", docs->pages[i]->docID, docs->pages[i]->score);
-                    //fprintf(stdout, "1 is: %d, %d\n", docs->pages[i+1]->docID, docs->pages[i+1]->score);
-                    flag = true;
-                    //printf("changing thing around\n");
+                    if (docs->pages[i+1] != NULL){
+                        docs->pages[i+1]->docID = docs->pages[i]->docID;        //move each element one forward
+                        docs->pages[i+1]->score = docs->pages[i]->score;
+                        //fprintf(stdout, "0 is: %d, %d\n", docs->pages[i]->docID, docs->pages[i]->score);
+                        //fprintf(stdout, "1 is: %d, %d\n", docs->pages[i+1]->docID, docs->pages[i+1]->score);
+                        flag = true;
+                        //printf("changing thing around\n");
+                    }
                 }
                 else {
                     break;

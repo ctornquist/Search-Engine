@@ -1,0 +1,304 @@
+bash -v testing.sh
+switchml () {  typeset swfound=1;
+ if [ "${MODULES_USE_COMPAT_VERSION:-0}" = '1' ]; then
+ typeset swname='main';
+ if [ -e /usr/share/Modules/libexec/modulecmd.tcl ]; then
+ typeset swfound=0;
+ unset MODULES_USE_COMPAT_VERSION;
+ fi;
+ else
+ typeset swname='compatibility';
+ if [ -e /usr/share/Modules/libexec/modulecmd-compat ]; then
+ typeset swfound=0;
+ MODULES_USE_COMPAT_VERSION=1;
+ export MODULES_USE_COMPAT_VERSION;
+ fi;
+ fi;
+ if [ $swfound -eq 0 ]; then
+ echo "Switching to Modules $swname version";
+ source /usr/share/Modules/init/bash;
+ else
+ echo "Cannot switch to Modules $swname version, command not found";
+ return 1;
+ fi
+}
+module () {  _module_raw "$@" 2>&1
+}
+_module_raw () {  unset _mlshdbg;
+ if [ "${MODULES_SILENT_SHELL_DEBUG:-0}" = '1' ]; then
+ case "$-" in 
+ *v*x*)
+ set +vx;
+ _mlshdbg='vx'
+ ;;
+ *v*)
+ set +v;
+ _mlshdbg='v'
+ ;;
+ *x*)
+ set +x;
+ _mlshdbg='x'
+ ;;
+ *)
+ _mlshdbg=''
+ ;;
+ esac;
+ fi;
+ unset _mlre _mlIFS;
+ if [ -n "${IFS+x}" ]; then
+ _mlIFS=$IFS;
+ fi;
+ IFS=' ';
+ for _mlv in ${MODULES_RUN_QUARANTINE:-};
+ do
+ if [ "${_mlv}" = "${_mlv##*[!A-Za-z0-9_]}" -a "${_mlv}" = "${_mlv#[0-9]}" ]; then
+ if [ -n "`eval 'echo ${'$_mlv'+x}'`" ]; then
+ _mlre="${_mlre:-}${_mlv}_modquar='`eval 'echo ${'$_mlv'}'`' ";
+ fi;
+ _mlrv="MODULES_RUNENV_${_mlv}";
+ _mlre="${_mlre:-}${_mlv}='`eval 'echo ${'$_mlrv':-}'`' ";
+ fi;
+ done;
+ if [ -n "${_mlre:-}" ]; then
+ eval `eval ${_mlre}/usr/bin/tclsh /usr/share/Modules/libexec/modulecmd.tcl bash '"$@"'`;
+ else
+ eval `/usr/bin/tclsh /usr/share/Modules/libexec/modulecmd.tcl bash "$@"`;
+ fi;
+ _mlstatus=$?;
+ if [ -n "${_mlIFS+x}" ]; then
+ IFS=$_mlIFS;
+ else
+ unset IFS;
+ fi;
+ unset _mlre _mlv _mlrv _mlIFS;
+ if [ -n "${_mlshdbg:-}" ]; then
+ set -$_mlshdbg;
+ fi;
+ unset _mlshdbg;
+ return $_mlstatus
+}
+#make clean
+#clear
+#make
+
+# testing wrong number of parameters
+./querier too many parameters here
+usage: "./querier pageDir indexFilename" 
+./querier notenoughparams
+usage: "./querier pageDir indexFilename" 
+
+# testing directory that doesn't exist
+./querier imnotreal test
+Can't read from directory or not crawler directory
+
+# testing non crawler directory
+./querier ../indexer/fake test
+Can't read from directory or not crawler directory
+
+# testing index file that doesn't exist
+./querier ../indexer/crawler1/ notreal
+Can't read index file
+
+# testing a lot of bad queries
+# note: the output may be weird here b/c C prints to stderr before stdout
+cat test | ./querier ../indexer/crawler1/ ../indexer/ans1
+Queries can't end with 'and' or 'or'. 
+Queries can't start with 'and' or 'or'. 
+Only letters allowed. 
+Only letters allowed. 
+Only letters allowed. 
+Query? -----------------------------------------
+Query? -----------------------------------------
+Query? Can't have two operators in a row.
+-----------------------------------------
+Query? Can't have two operators in a row.
+-----------------------------------------
+Query? Can't have two operators in a row.
+-----------------------------------------
+Query? -----------------------------------------
+Query? -----------------------------------------
+Query? -----------------------------------------
+Query? 
+# testing 15 queries on a small dataset
+./fuzzquery ../indexer/ans1 15 2 | ./querier ../indexer/crawler1/ ../indexer/ans1
+./fuzzquery: generating 15 queries from 22 words
+Only letters allowed. 
+Query? Query: ingold 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: search biology or depth or coding or tse page 
+Matches 3 documents (ranked)
+Score: 1 Doc 1: http://old-www.cs.dartmouth.edu/~cs50/data/tse/letters/index.html
+Score: 1 Doc 6: http://old-www.cs.dartmouth.edu/~cs50/data/tse/letters/H.html
+Score: 1 Doc 8: http://old-www.cs.dartmouth.edu/~cs50/data/tse/letters/D.html
+-----------------------------------------
+Query? Query: playground computational or graph 
+Matches 1 documents (ranked)
+Score: 2 Doc 5: http://old-www.cs.dartmouth.edu/~cs50/data/tse/letters/G.html
+-----------------------------------------
+Query? Query: first and first graph fast 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? -----------------------------------------
+Query? Query: this this or traversal the or depth tse 
+Matches 1 documents (ranked)
+Score: 2 Doc 1: http://old-www.cs.dartmouth.edu/~cs50/data/tse/letters/index.html
+-----------------------------------------
+Query? Query: syringotome and breadth 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: thegnly and depth for or vindications or search 
+Matches 2 documents (ranked)
+Score: 4 Doc 3: http://old-www.cs.dartmouth.edu/~cs50/data/tse/letters/B.html
+Score: 1 Doc 8: http://old-www.cs.dartmouth.edu/~cs50/data/tse/letters/D.html
+-----------------------------------------
+Query? Query: for playground and biology transform playground uroscopic 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: expressionful fast and breadth or walston huffman 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: eniac breadth 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: dovens fourier or search 
+Matches 2 documents (ranked)
+Score: 4 Doc 3: http://old-www.cs.dartmouth.edu/~cs50/data/tse/letters/B.html
+Score: 1 Doc 8: http://old-www.cs.dartmouth.edu/~cs50/data/tse/letters/D.html
+-----------------------------------------
+Query? Query: search algorithm and fourier 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: the or the or bedrel and depth 
+Matches 1 documents (ranked)
+Score: 2 Doc 1: http://old-www.cs.dartmouth.edu/~cs50/data/tse/letters/index.html
+-----------------------------------------
+Query? Query: emplastration home transform 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? 
+# testing 35 queries on a large dataset
+./fuzzquery ../indexer/ans3 35 4 | ./querier ../indexer/crawler3/ ../indexer/ans3
+./fuzzquery: generating 35 queries from 2326 words
+Only letters allowed. 
+Only letters allowed. 
+Only letters allowed. 
+Only letters allowed. 
+Only letters allowed. 
+Query? Query: shtum or musical 
+Matches 3 documents (ranked)
+Score: 2 Doc 8: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/rip-it-up-and-start-again_986/index.html
+Score: 2 Doc 7: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/our-band-could-be-your-life-scenes-from-the-american-indie-underground-1981-1991_985/index.html
+Score: 1 Doc 64: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/category/books/fiction_10/index.html
+-----------------------------------------
+Query? -----------------------------------------
+Query? -----------------------------------------
+Query? Query: worries 
+Matches 1 documents (ranked)
+Score: 2 Doc 12: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/starving-hearts-triangular-trade-trilogy-1_990/index.html
+-----------------------------------------
+Query? Query: pulls online or stand 
+Matches 2 documents (ranked)
+Score: 1 Doc 43: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/category/books/horror_31/index.html
+Score: 1 Doc 6: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/olio_984/index.html
+-----------------------------------------
+Query? Query: narratives 
+Matches 1 documents (ranked)
+Score: 1 Doc 18: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/sapiens-a-brief-history-of-humankind_996/index.html
+-----------------------------------------
+Query? Query: disparity hospital poetry or trade peak and cruising 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: observations 
+Matches 1 documents (ranked)
+Score: 1 Doc 49: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/category/books/art_25/index.html
+-----------------------------------------
+Query? Query: benjamin or nerdy and ready and vraie 
+Matches 1 documents (ranked)
+Score: 1 Doc 38: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/category/books/biography_36/index.html
+-----------------------------------------
+Query? Query: fifteen wars resident and victoria attempt 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: those 
+Matches 2 documents (ranked)
+Score: 2 Doc 11: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/shakespeares-sonnets_989/index.html
+Score: 1 Doc 3: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/its-only-the-himalayas_981/index.html
+-----------------------------------------
+Query? Query: acceptance assign and texas and toddlers 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? -----------------------------------------
+Query? Query: sentences captivately 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: fifty meaning anonymous 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: sonic touched or unheritable regard kitchen or should 
+Matches 2 documents (ranked)
+Score: 2 Doc 11: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/shakespeares-sonnets_989/index.html
+Score: 2 Doc 4: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/libertarianism-for-beginners_982/index.html
+-----------------------------------------
+Query? Query: this scenes and melding 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: iosep or knight or reporter 
+Matches 2 documents (ranked)
+Score: 2 Doc 19: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/sharp-objects_997/index.html
+Score: 1 Doc 50: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/category/books/paranormal_24/index.html
+-----------------------------------------
+Query? Query: dysgenic thalia gerrymanderer hall redheart 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: salem or sinlike or dowdiest 
+Matches 2 documents (ranked)
+Score: 2 Doc 22: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/a-light-in-the-attic_1000/index.html
+Score: 1 Doc 43: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/category/books/horror_31/index.html
+-----------------------------------------
+Query? Query: hate products or undescript or expertise 
+Matches 1 documents (ranked)
+Score: 1 Doc 16: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/the-dirty-little-secrets-of-getting-your-dream-job_994/index.html
+-----------------------------------------
+Query? Query: bridget 
+Matches 1 documents (ranked)
+Score: 2 Doc 65: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/category/books/womens-fiction_9/index.html
+-----------------------------------------
+Query? Query: appreciation 
+Matches 1 documents (ranked)
+Score: 1 Doc 3: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/its-only-the-himalayas_981/index.html
+-----------------------------------------
+Query? Query: maisey pioneer original noninformative excellent 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: award and countless memoir 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: tonight carri statelessness or torch regional 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: poet 
+Matches 1 documents (ranked)
+Score: 3 Doc 13: http://old-www.cs.dartmouth.edu/~cs50/data/tse/toscrape/catalogue/the-black-maria_991/index.html
+-----------------------------------------
+Query? Query: liveliness washington 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: resumes majesty 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: demons fused 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? -----------------------------------------
+Query? Query: rage lunarian or barbados or birds sharon and brilliant 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: abelmoschus 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? Query: lorises 
+Matches 0 documents (ranked)
+-----------------------------------------
+Query? -----------------------------------------
+Query? 
