@@ -137,8 +137,6 @@ int main(int argc, char *argv[]){
             }
             or_seq(res_or, res_and); //afterwards, add anything in and still into or
 
-            //fprintf(stdout, "answer: "); counters_print(res_or, stdout); printf("\n");
-
             // res_or is now the final one with all the scores
             print_scores(res_or, filename, len);
 
@@ -212,8 +210,6 @@ bool validate_query(char *words[], int words_size){
         return false; 
     }
 
-    //fprintf(stdout, "val and: %d\n", strcmp(words[0], "and"));
-    //fprintf(stdout, "val or: %d\n", strcmp(words[0], "or"));
 
     //can't start or end with operator
     if (strcmp(words[0], "and") == 0 || strcmp(words[0], "or") == 0 ){
@@ -396,23 +392,17 @@ void insertion_sort(void *arg, const int key, const int count ){
         new->score = count;
         bool flag = false;
         int i;
-        //printf("this page first: %d\n", key);
 
         if (docs->count > 0){                               //if there's more than one item                   
             for (i = docs->count -1; i >= 0; i--){          //for each element in the array
                 if (docs->pages[i]->score < count){         //if that element is smaller than the count..
-                    //printf("moving %d to %d\n", i, i+1);
                     if (docs->pages[i+1] == NULL){          //create a new node if needed
-                        //printf("allocating new one\n");
                         docs->pages[i+1] = malloc(sizeof(score_t));
                     }
                     if (docs->pages[i+1] != NULL){
                         docs->pages[i+1]->docID = docs->pages[i]->docID;        //move each element one forward
                         docs->pages[i+1]->score = docs->pages[i]->score;
-                        //fprintf(stdout, "0 is: %d, %d\n", docs->pages[i]->docID, docs->pages[i]->score);
-                        //fprintf(stdout, "1 is: %d, %d\n", docs->pages[i+1]->docID, docs->pages[i+1]->score);
                         flag = true;
-                        //printf("changing thing around\n");
                     }
                 }
                 else {
@@ -422,9 +412,6 @@ void insertion_sort(void *arg, const int key, const int count ){
             if(flag){
                 free(docs->pages[i+1]);                        //if items were moved, free what was in the last slot moved
                 docs->pages[i+1] = new;                        //insert new item into that slot
-                //printf("inserting in slot %d\n", i+1);
-                //fprintf(stdout, "after 0 is: %d, %d\n", docs->pages[0]->docID, docs->pages[0]->score);
-                //fprintf(stdout, "after 1 is: %d, %d\n", docs->pages[1]->docID, docs->pages[1]->score);
             } else {                                     //if nothing was moved (it belongs at the end), insert it there
                 docs->pages[docs->count] = new;
             }
