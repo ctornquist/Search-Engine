@@ -141,7 +141,9 @@ int main(int argc, char *argv[]){
 
             // res_or is now the final one with all the scores
             print_scores(res_or, filename, len);
-            fprintf(stdout, "-----------------------------------------\n");
+
+            //clean up 
+            counters_delete(res_and);
 
         }
         } 
@@ -151,10 +153,8 @@ int main(int argc, char *argv[]){
         free(line);
         free_words(words, words_size);
         free(pointers);
-        counters_delete(res_and);
-        if (words_size != 1){        //only gets newed if you have more than one word
-            counters_delete(res_or);
-        }
+        counters_delete(res_or);
+        fprintf(stdout, "-----------------------------------------\n");
         fprintf(stdout, "Query? ");
     }
 
@@ -351,6 +351,7 @@ void print_scores(counters_t *res, char *filename, int len){
     docs->count = 0;
     counters_iterate(res, docs, &insertion_sort);
     fprintf(stdout, "Matches %d documents (ranked)\n", docs->count);
+
 
     //printing scores and urls
     for (int i = 0; i<docs->count; i++){

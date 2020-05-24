@@ -1,3 +1,4 @@
 *.o
 querier
 core
+fuzzquery

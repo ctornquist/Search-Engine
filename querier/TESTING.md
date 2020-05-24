@@ -1,1 +1,4 @@
-tester
+# Lab 6 Querier - Caroline Tornquist
+
+### Methods
+I tested each of the modules as I was builing them, to ensure correctness throughout the process. Once I was certain each part worked as it should, I wrote a bash testing script to work through a few test cases. The first five ensure that the indexer parses arguments correctly, and should get error messages. These tests include directories that don't exist or weren't made by crawler, index files that can't be read, and the wrong number of arguments. The next test case tests the querier's parsing of incorrect queries. It pipes in queries that have ands and ors at the beginning/end, too many together, and several with non-alphabet characters. These should all print error messages. The last few test cases are from different crawler directories, and with random queries created using fuzzquery.c. I tested both the letters directory, which is realtively small, and the wikipedia directory, which is relatively large, and spot checked each to ensure the correct output was being generated. 

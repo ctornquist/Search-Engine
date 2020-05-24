@@ -1,7 +1,7 @@
-# Lab 6 Querier - Caroline Tornquist
- 
-# Pseudocode
-Querier:  
+# Lab 6 Querier - Caroline Tornquist  
+
+# Pseudocode 
+Querier:   
 1. Parse arguments, adding a slash to the end of the directory if needed, make sure there is a .crawler file that can be opened in it, and check if the file given can be read. I just appended .crawler to the end of the given filename, and then inserted the '\0' at the end to remove it after I'd checked the directory.   
 2. Create a hashtable called "index" using hashtable_new
 3. Call index_load to load data in to the index from the file. 

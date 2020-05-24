@@ -2,6 +2,7 @@
 
 ### Usage 
 Querier is used to get parse queries, search the given indexfile for those words and print (in ranked order) the urls of pages that contain those words. It supports "and seqences" where the words must both show up in the same document, and "or sequences" where either word may appear in any document. Crawler directory should have been produced by crawler, and indexFile should be its acccompanying file created by indexer. 
+I implemented the full requirements spec, which supports and and or operations and sorts the pages in decreasing order.
 
 command line: ./querier crawlerDirectory indexFile
 
