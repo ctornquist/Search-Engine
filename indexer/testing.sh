@@ -53,10 +53,8 @@ echo Files sorted
 #comparing each to the correct answer file
 echo Comparing files
 diff --brief idx2.sorted ../tse-output/wikipedia-index-1
-diff --brief idx2_remake.sorted ../tse-output/wikipedia-index-1
+cmp idx2_remake.sorted ../tse-output/wikipedia-index-1
 echo Done!
-
-
 
 # testing the directory on the directory made from crawling the to scrape playground to depth 1
 echo Starting indexer

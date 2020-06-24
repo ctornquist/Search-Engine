@@ -1,18 +1,20 @@
 # Lab 6 Caroline Tornquist
 
+### To Run
+command line: ./querier crawlerDirectory indexFile
+example for a relatively large dataset: ./querier ../tse-output/toscrape-depth-2/ ../tse-output/toscrape-index-2
+
 ### Usage 
 Querier is used to get parse queries, search the given indexfile for those words and print (in ranked order) the urls of pages that contain those words. It supports "and seqences" where the words must both show up in the same document, and "or sequences" where either word may appear in any document. Crawler directory should have been produced by crawler, and indexFile should be its acccompanying file created by indexer. 
-I implemented the full requirements spec, which supports and and or operations and sorts the pages in decreasing order.
-
-command line: ./querier crawlerDirectory indexFile
-
-### Assumptions
-Querier checks its arguments, ensuring that the directory was produced by crawler and the indexFile is readable. However, it assumes that the directory has files 1, 2, 3... without gaps, and that the file given was actually created by indexer. 
+I implemented the full requirements spec, which supports and and or operations and sorts the pages in decreasing order. 
 
 ### Compilation
 To compile querier, simply "make". To remove all the executables and test files, "make clean". "make test" will run a bash script with a number of test cases, the output of which is in testing.out.  
 
 Note: the archives "common.a" and "libcs50.a" are needed to compile this directory. If they don't exist, run "make" in both the common and libcs50 directories to create them. 
+
+### Assumptions
+Querier checks its arguments, ensuring that the directory was produced by crawler and the indexFile is readable. However, it assumes that the directory has files 1, 2, 3... without gaps, and that the file given was actually created by indexer.
 
 ### Major Functions
  ```c

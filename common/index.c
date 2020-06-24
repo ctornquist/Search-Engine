@@ -45,7 +45,7 @@ void index_build(char *filename, int len, hashtable_t *index){
         
         int pos = 0;
         while ((word = webpage_getNextWord(page, &pos)) != NULL) {       //reading each word from the HTML
-            norm_word = normalizeWord(word);                             //making all lowercase
+            norm_word = normalizeWord(word, false);                      //making all lowercase
 
             if (norm_word != NULL){
                 if ( (count = hashtable_find(index, norm_word)) != NULL ){   //if that word already exists

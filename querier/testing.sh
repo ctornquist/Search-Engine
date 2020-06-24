@@ -20,12 +20,7 @@
 cat test | ./querier ../tse-output/letters-depth-4/ ../tse-output/letters-index-4
 
 # testing 15 queries on a small dataset
-./fuzzquery ../indexer/ans1 25 0 | ./querier ../tse-output/letters-depth-6/ ../tse-output/letters-index-6
+./fuzzquery ../tse-output/letters-index-6 25 2 | ./querier ../tse-output/letters-depth-6/ ../tse-output/letters-index-6
 
 # testing 35 queries on a large dataset
-./fuzzquery ../indexer/ans3 35 4 | ./querier ../tse-output/toscrape-depth-2/ ../tse-output/toscrape-index-2
-
-
-#ones that dont work
-search or cerebrasthenia and graph huffman and for
-search or page or depth and this and search
+./fuzzquery ../tse-output/toscrape-index-2 35 4 | ./querier ../tse-output/toscrape-depth-2/ ../tse-output/toscrape-index-2

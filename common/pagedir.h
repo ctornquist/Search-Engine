@@ -9,6 +9,11 @@
 #include "../libcs50/bag.h"
 #include "../libcs50/hashtable.h"
 
+/*
+ * pageDir.h    Caroline Tornquist      May, 2020
+ * 
+ * pageDir.h contains the definitions for functions to be used by crawler.c to maniuplate webpages.
+ */
 
 /*
  * Determines if a directory exists by creating a file in that directory and 

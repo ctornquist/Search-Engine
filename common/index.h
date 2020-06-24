@@ -12,6 +12,12 @@
 #include "word.h"
 #include "pagedir.h"
 
+/* index.h Caroline Tornquist May 2020
+ * 
+ * Function definitions to help building the index strucutre from webpages, printing it to a file, and
+ * building it again from a previous file.
+ */
+
 /* This takes the name of a crawler directory path (that must end with a '/'), the length of that filename, 
  * and a hashtable pointer. 
  * Reading one file at a time from the directory, it reads each word in that file, adds it to the hashtable and puts
