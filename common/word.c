@@ -13,9 +13,9 @@
  * Allocates memory for a new string that must be free'd by the user later. 
  */
 char *normalizeWord(char *word){
-    /*if (strlen(word)<3) { //words fewer than three letters don't count as words
+    if (strlen(word)<3) { //words fewer than three letters don't count as words
         return NULL; 
-    }*/
+    }
  
     char *lower = (char *)malloc(strlen(word)*sizeof(char)+1); 
     strcpy(lower, word);

@@ -26,7 +26,7 @@ index.o: ../common/index.h
 .PHONY: test clean
 
 test: 
-	bash -v testing.sh
+	bash testing.sh
 
 clean:
 	rm -f *~ *.o *.dSYM

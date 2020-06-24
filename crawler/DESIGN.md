@@ -1,3 +1,6 @@
+# DESIGN
+Written by Dartmouth CS50 faculty.
+
 ---
 layout: page
 title: TSE Crawler Design Spec

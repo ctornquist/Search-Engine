@@ -25,5 +25,5 @@ clean:
 	rm -f $(PROG)
 	rm -f core
 	rm -f test/*
-	rm -f test*/*
+	rm -f tests/test*/*
 	rm -f wikiD2/*

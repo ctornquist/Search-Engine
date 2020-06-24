@@ -1,8 +1,8 @@
-# Lab 4 Crawler - Caroline Tornquist  
+# Crawler - Caroline Tornquist  
    
 ### Testing  
   
-I tested crawler using a bash script ```testing.sh```. This script runs 17 different test cases, and ensures all of their outputs are correct. 
+I tested crawler using a bash script ```testing.sh```. This script runs a number of different test cases, and ensures all of their outputs are correct. 
   
 The first 8 test cases ensure that my paramenter checking is functional. I test having too many inputs, not enough inputs, a non internal url, an internal url that doesn't exist, a negative max depth, a non integer max depth, and giving a directory without a slash at the end.  
 Each of these write a helpful error message to stderr, cleans up any allocated memory, and exits with status one. I manually ran ```myvalgrind``` on each of these cases to ensure there would be no memory leaks regardless of where the program stopped running. 

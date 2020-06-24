@@ -16,7 +16,7 @@ clear
 
 # testing the directory on the directory made from crawling the letter playground to depth 5
 echo Starting indexer
-./indexer crawler1 idx1
+./indexer ../tse-output/letters-depth-5/ idx1
 echo Index file made
 
 echo Starting indextest
@@ -30,15 +30,15 @@ echo Files sorted
 
 #comparing each to the correct answer file
 echo Comparing files
-diff --brief idx1.sorted ans1
-diff --brief idx1_remake.sorted ans1
+diff --brief idx1.sorted ../tse-output/letters-index-5
+diff --brief idx1_remake.sorted ../tse-output/letters-index-5
 echo Done!
 
 
 
 # testing the directory on the directory made from crawling the wiki playground to depth 1
 echo Starting indexer
-./indexer crawler2 idx2
+./indexer ../tse-output/wikipedia-depth-1/ idx2
 echo Index file made
 
 echo Starting indextest
@@ -52,15 +52,15 @@ echo Files sorted
 
 #comparing each to the correct answer file
 echo Comparing files
-diff --brief idx2.sorted ans2
-diff --brief idx2_remake.sorted ans2
+diff --brief idx2.sorted ../tse-output/wikipedia-index-1
+diff --brief idx2_remake.sorted ../tse-output/wikipedia-index-1
 echo Done!
 
 
 
 # testing the directory on the directory made from crawling the to scrape playground to depth 1
 echo Starting indexer
-./indexer crawler3 idx3
+./indexer ../tse-output/toscrape-depth-1/ idx3
 echo Index file made
 
 echo Starting indextest
@@ -74,15 +74,15 @@ echo Files sorted
 
 #comparing each to the correct answer file
 echo Comparing files
-diff --brief idx3.sorted ans3
-diff --brief idx3_remake.sorted ans3
+diff --brief idx3.sorted ../tse-output/toscrape-index-1
+diff --brief idx3_remake.sorted ../tse-output/toscrape-index-1
 echo Done!
 
 
 
 # testing the directory on the directory made from crawling the to scrape playground to depth 2
 echo Starting indexer
-./indexer crawler4 idx4
+./indexer ../tse-output/toscrape-depth-2/ idx4
 echo Index file made
 
 echo Starting indextest
@@ -96,6 +96,6 @@ echo Files sorted
 
 #comparing each to the correct answer file
 echo Comparing files
-diff --brief idx4.sorted ans4
-diff --brief idx4_remake.sorted ans4
+diff --brief idx4.sorted ../tse-output/toscrape-index-2
+diff --brief idx4_remake.sorted ../tse-output/toscrape-index-2
 echo Done!

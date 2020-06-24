@@ -1,13 +1,13 @@
-#include <stdio.h>
-#include <stdbool.h>
-#include "counters.h"
-#include "memory.h"
-
 /* counters.c Caroline Tornquist May 2020
  * 
  * Program to implement functionality specified in counters.h. Creates a data type that holds an integer
  * key and its count. 
  */
+
+#include <stdio.h>
+#include <stdbool.h>
+#include "counters.h"
+#include "memory.h"
 
 typedef struct countersNode {
     int key; //integer key

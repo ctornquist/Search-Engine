@@ -12,6 +12,8 @@ Querier checks its arguments, ensuring that the directory was produced by crawle
 ### Compilation
 To compile querier, simply "make". To remove all the executables and test files, "make clean". "make test" will run a bash script with a number of test cases, the output of which is in testing.out.  
 
+Note: the archives "common.a" and "libcs50.a" are needed to compile this directory. If they don't exist, run "make" in both the common and libcs50 directories to create them. 
+
 ### Major Functions
  ```c
  /*

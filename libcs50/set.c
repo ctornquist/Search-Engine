@@ -1,3 +1,9 @@
+/* set.c Caroline Tornquist May 2020
+ * 
+ * Program to implement set.h, a collection of elements with {key, value} pairs where the keys are
+ * chars and the values are types defined by the user. 
+ */
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>

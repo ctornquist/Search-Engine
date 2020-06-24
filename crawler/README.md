@@ -1,8 +1,17 @@
-# Lab 4 Crawler - Caroline Tornquist
+# Crawler - Caroline Tornquist
+
+### To Run
+To run from the command line: ./crawler seedURL pageDir maxDepth.
+
+### Compilation
+To compile, simply "make". 
+
+Note: the archives "common.a" and "libcs50.a" are needed to compile this directory. If they don't exist, run "make" in both the common and libcs50 directories to create them. 
+ 
+"Make clean" will clean up all of the executables and test files. "Make test" will run ```testing.sh```, a bash script with a number of test cases. 
 
 ### Usage 
-Crawler will scrape websites for their HTML data, beginning at the seed URL and following all of the links on that page and any subsequent pages until the maxdepth is reached. It prints each webpage's URL, depth, and HTML data to a separate file in the directory specified named with a unique ID number. The user is responsible for supplying a seedURL, directory that exists (the program will not make one if it doesn't exist already) and a max depth to search. 
-To run from the command line: ./crawler seedURL pageDir maxDepth. 
+Crawler will scrape websites for their HTML data, beginning at the seed URL and following all of the links on that page and any subsequent pages until the maxdepth is reached. It prints each webpage's URL, depth, and HTML data to a separate file in the directory specified named with a unique ID number. The user is responsible for supplying a seedURL, directory that exists (the program will not make one if it doesn't exist already) and a max depth to search.  
 
 
 ### Notes 
@@ -17,9 +26,4 @@ No assumptions are made other than those made clear in the file.
 
 
 ### Functions 
-The only function is ```delete_blank()``` which doesn't do anything, but is necessary to pass into the hashtable function as an itemdelete function. Because the keys for hashtable are just empty chars, they don't need to be freed. 
- 
-### Compilation
-To compile, simply "make". 
- 
-"Make clean" will clean up all of the executables and test files. "Make test" will run ```testing.sh```, a bash script with 17 test cases. 
+The only function is ```delete_blank()``` which doesn't do anything, but is necessary to pass into the hashtable function as an "itemdelete" function to iterate over. Because the keys for hashtable are just empty chars, they don't need to be free'd. 

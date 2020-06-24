@@ -1,3 +1,9 @@
+/* hashtable.c Caroline Tornquist May 2020
+ * 
+ * Program to impelement hashtable.h. An array of sets (see set.c), each a collection of nodes 
+ * with char keys and values defined by the user. Utilizes hashing function provided by Dartmouth faculty.
+ */
+
 #include <stdio.h>
 #include <stdbool.h>
 #include "set.h"
