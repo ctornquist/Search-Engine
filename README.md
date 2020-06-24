@@ -10,7 +10,7 @@ To clean up the whole project, run `make clean`.
 
 ### Overview
 This tiny search engine was created to search through several Dartmouth servers. It consists of five main parts:  
-```crawler```: given a seedUrl it takes data from that page, any links on that page, and any links on the following pages up to a certain depth and saves it in a directory containing one file per webpage "crawled"
+```crawler```: given a seedUrl it takes data from that page, any links on that page, and any links on the following pages up to a certain depth and saves it in a directory containing one file per webpage "crawled"  
 ```indexer```: takes data from a directory produced by crawler and builds a large hashtable with each word from each webpage to easily access it  
 ```querier```: reads searches or "queries" given by the user, determines which webpages contain those words and displays them ranked based on relevancy  
 ```common```: contains a number of files with functions used by several of the above directories  
