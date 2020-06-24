@@ -6,7 +6,7 @@ PROG = querier
 PROG2 = fuzzquery
 OBJS = querier.o ../libcs50/webpage.o ../common/pagedir.o ../common/word.o ../common/index.o
 OBJS2 = 
-LLIBS = ../libcs50/libcs50-given.a ../common/common.a
+LLIBS = ../libcs50/libcs50.a ../common/common.a
 LIBS = -lm
 
 #RULES

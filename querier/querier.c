@@ -119,13 +119,19 @@ int main(int argc, char *argv[]){
 
 
             for (int i = 0; i < words_size; i++){                    //looping over each word in the query
+                printf("or: "); if (res_or != NULL) counters_print(res_or, stdout);
+                printf("and: "); if (res_and != NULL) counters_print(res_and, stdout);
                 if (is_empty){
                     res_and = copy_counter(hashtable_find(index, words[i]));
                     is_empty = false;
                 }
                 else if (strcmp(words[i], "or") != 0 && strcmp(words[i], "and") != 0){   //if it's not an 'or' or 'and' or the last word
                     pointers->first = res_and;
-                    pointers->second = hashtable_find(index, words[i]);                        
+                    //WHAT TO DO IF THE WORD DOESN'T EXIST?? HOW TO ADD TO RES_AND???
+                    pointers->second = hashtable_find(index, words[i]); 
+                    if (pointers->second == NULL) {
+                        pointers->second = counters_new();
+                    }                      
                     and_seq(pointers);                              //keep updating and
                     is_empty = false;
                 }
@@ -322,6 +328,7 @@ void size_helper(void *arg, const int key, const int count){
     int *size = arg;
 
     if (count != 0){
+        printf("docID: %d, score: %d\n", key, count);
         (*size)++;
     }
 }
@@ -344,6 +351,7 @@ void print_scores(counters_t *res, char *filename, int len){
     //initializing docs and inserting all of the score structs in descending order
     score_srt_t *docs = malloc(sizeof(score_srt_t));
     docs->pages = malloc(sizeof(score_t)*num);
+    printf("size is: %d\n", num);
     docs->count = 0;
     counters_iterate(res, docs, &insertion_sort);
     fprintf(stdout, "Matches %d documents (ranked)\n", docs->count);
@@ -364,24 +372,28 @@ void print_scores(counters_t *res, char *filename, int len){
         fp = fopen(filename, "r");
         if (fp != NULL){
             url = freadlinep(fp);
-            fprintf(stdout, "Score: %d Doc %d: ", docs->pages[i]->score, docs->pages[i]->docID);
-            fprintf(stdout, "%s\n", url);
-            
+            if (url != NULL) {
+                fprintf(stdout, "%s\n", url);
+                free(url);
+            } else {
+                printf("Can't read index file\n");
+            }
+
             //free for next time around
-            free(url);
             fclose(fp);
         }
+
+        filename[len] = '\0';         //remove docIDs for next iteration
 
     }
 
     free_docs(docs, docs->count);   //free docs for next iteration
-    filename[len+1] = '\0';         //remove docIDs for next iteration
     free(val);                      //clean up for next time
- 
 }
 
 /* Used by counters_iterate on res_and to insert each item into an array of struct scores in descending order. 
  * Arg is a struct that contains an array of struct scores and a counter to index into the array. 
+ * 
  * Uses insertion sort algorithm to get from the counters to the array. 
  */ 
 void insertion_sort(void *arg, const int key, const int count ){
@@ -390,16 +402,16 @@ void insertion_sort(void *arg, const int key, const int count ){
         score_t *new = malloc(sizeof(score_t));             //allocate for new element
         new->docID = key;                                   //update element
         new->score = count;
-        bool flag = false;
+        bool flag = false;                                  //true if items were moved
         int i;
 
-        if (docs->count > 0){                               //if there's more than one item                   
+        if (docs->count > 1){                               //if there's more than one item                   
             for (i = docs->count -1; i >= 0; i--){          //for each element in the array
                 if (docs->pages[i]->score < count){         //if that element is smaller than the count..
                     if (docs->pages[i+1] == NULL){          //create a new node if needed
                         docs->pages[i+1] = malloc(sizeof(score_t));
                     }
-                    if (docs->pages[i+1] != NULL){
+                    if (docs->pages[i+1] != NULL){          //making sure it's not null
                         docs->pages[i+1]->docID = docs->pages[i]->docID;        //move each element one forward
                         docs->pages[i+1]->score = docs->pages[i]->score;
                         flag = true;
@@ -409,7 +421,7 @@ void insertion_sort(void *arg, const int key, const int count ){
                     break;
                 }
             }
-            if(flag){
+            if (flag){
                 free(docs->pages[i+1]);                        //if items were moved, free what was in the last slot moved
                 docs->pages[i+1] = new;                        //insert new item into that slot
             } else {                                     //if nothing was moved (it belongs at the end), insert it there
@@ -418,10 +430,12 @@ void insertion_sort(void *arg, const int key, const int count ){
         } else {                                        //first time around, just insert it
             docs->pages[docs->count] = new;
         }
+        printf("\n");
         docs->count = docs->count + 1;                  //increment counter
-    }  
-}  
- 
+        printf("docs count: %d\n", docs->count);
+    }   
+}
+
 
 /*
  * Loops over all the char*'s in words and free's each of them. 
@@ -436,9 +450,9 @@ void free_words(char *words[], int words_size){
 
 /* Loop over all the elements in doc's array, freeing each one, then free the struct itself
  */
-
 void free_docs(score_srt_t *docs, int num){
     for(int i = 0; i < num; i++){
+        printf("freeing index: %d, docID: %d, score: %d\n", i, docs->pages[i]->docID, docs->pages[i]->score);
         free(docs->pages[i]);
     }
     free(docs->pages);

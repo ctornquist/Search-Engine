@@ -4,7 +4,7 @@ CFLAGS = -Wall -g -pedantic -std=c11 -ggdb -I ../libcs50 -I ../common
 PROG = crawler
 PROG2 = testing.sh
 OBJS = crawler.o ../libcs50/webpage.o ../common/pagedir.o
-LLIBS = ../libcs50/libcs50-given.a ../common/common.a
+LLIBS = ../libcs50/libcs50.a ../common/common.a
 LIBS = -lm
 
 #RULES
