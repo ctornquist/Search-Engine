@@ -21,4 +21,4 @@ clean:
 	rm -f core
 	rm -f common.a
 	rm -f vgcore*
-
+	rm -f word
