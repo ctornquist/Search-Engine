@@ -2,7 +2,7 @@
 ## CS50 Spring 2020, Tiny Search Engine
 
 ### Usage
-To start searches on a sample dataset, run 'make query' from the top level directory. Each of the three parts, crawler, indexer and querier, have their own command line interfaces specified in their directory README. 
+To start searches on a sample dataset, run 'make query' from the top level directory in terminal. Each of the three parts, crawler, indexer and querier, have their own command line interfaces specified in their directory README. 
 
 ### Compilation
 To build the entire project, run `make`.
